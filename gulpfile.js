@@ -101,7 +101,7 @@ const fonts = () => {
 }
 
 const watcher = () => {
-	gulp.watch(`${app}/*.html`, gulp.series(html))
+	gulp.watch(`${app}/**/*.html`, gulp.series(html))
 	gulp.watch(`${app}/sass/**/*.scss`, gulp.series(styles))
 	gulp.watch(`${app}/js/*.js`, gulp.series(scripts))
 	gulp.watch(`${app}/img/**/*.*`, gulp.series(images))
