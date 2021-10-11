@@ -1,4 +1,4 @@
-const gulp = require('gulp')
+const { src, dest, watch, series, parallel } = require('gulp')
 const extender = require('gulp-html-extend')
 const sync = require('browser-sync').create()
 const sass = require('gulp-sass')(require('sass'))
@@ -31,38 +31,34 @@ const clean = () => {
 }
 
 const html = () => {
-	return gulp
-		.src(`${app}/*.html`)
+	return src(`${app}/*.html`)
 		.pipe(
 			extender({
 				annotations: false
 			})
 		)
-		.pipe(gulp.dest(build))
+		.pipe(dest(build))
 		.pipe(sync.reload({ stream: true }))
 }
 
 const bundle_css = () => {
-	return gulp
-		.src(['node_modules/bootstrap/dist/css/bootstrap-grid.css'])
+	return src(['node_modules/bootstrap/dist/css/bootstrap-grid.css'])
 		.pipe(concat('bundle.css'))
 		.pipe(csso())
-		.pipe(gulp.dest(`${build}/css`))
+		.pipe(dest(`${build}/css`))
 		.pipe(sync.reload({ stream: true }))
 }
 
 const bundle_js = () => {
-	return gulp
-		.src(['node_modules/gsap/dist/gsap.js'])
+	return src(['node_modules/gsap/dist/gsap.js'])
 		.pipe(concat('bundle.js'))
 		.pipe(uglify())
-		.pipe(gulp.dest(`${build}/js`))
+		.pipe(dest(`${build}/js`))
 		.pipe(sync.reload({ stream: true }))
 }
 
 const styles = () => {
-	return gulp
-		.src(`${app}/sass/**/*.scss`)
+	return src(`${app}/sass/**/*.scss`)
 		.pipe(sass())
 		.pipe(
 			autoprefixer({
@@ -70,45 +66,41 @@ const styles = () => {
 				cascade: false
 			})
 		)
-		.pipe(gulp.dest(`${build}/css`))
+		.pipe(dest(`${build}/css`))
 		.pipe(sync.reload({ stream: true }))
 }
 
 const scripts = () => {
-	return gulp
-		.src(`${app}/js/*.js`)
-		.pipe(gulp.dest(`${build}/js`))
+	return src(`${app}/js/*.js`)
+		.pipe(dest(`${build}/js`))
 		.pipe(sync.reload({ stream: true }))
 }
 
 const images = () => {
-	return gulp
-		.src(`${app}/img/**/*.*`)
-		.pipe(gulp.dest(`${build}/img`))
+	return src(`${app}/img/**/*.*`)
+		.pipe(dest(`${build}/img`))
 		.pipe(sync.reload({ stream: true }))
 }
 
 const fonts = () => {
-	gulp
-		.src(`${app}/fonts/**/*.*`)
+	src(`${app}/fonts/**/*.*`)
 		.pipe(ttf2woff())
-		.pipe(gulp.dest(`${build}/fonts`))
-	return gulp
-		.src(`${app}/fonts/**/*.*`)
+		.pipe(dest(`${build}/fonts`))
+	return src(`${app}/fonts/**/*.*`)
 		.pipe(ttf2woff2())
-		.pipe(gulp.dest(`${build}/fonts`))
+		.pipe(dest(`${build}/fonts`))
 		.pipe(sync.reload({ stream: true }))
 }
 
 const watcher = () => {
-	gulp.watch(`${app}/**/*.html`, gulp.series(html))
-	gulp.watch(`${app}/sass/**/*.scss`, gulp.series(styles))
-	gulp.watch(`${app}/js/*.js`, gulp.series(scripts))
-	gulp.watch(`${app}/img/**/*.*`, gulp.series(images))
-	gulp.watch(`${app}/fonts/**/*.*`, gulp.series(fonts))
+	watch(`${app}/**/*.html`, html)
+	watch(`${app}/sass/**/*.scss`, styles)
+	watch(`${app}/js/*.js`, scripts)
+	watch(`${app}/img/**/*.*`, images)
+	watch(`${app}/fonts/**/*.*`, fonts)
 }
 
-const init = gulp.series(
+const init = series(
 	clean,
 	html,
 	bundle_css,
@@ -119,4 +111,4 @@ const init = gulp.series(
 	fonts
 )
 
-exports.default = gulp.parallel(init, watcher, serve)
+exports.default = parallel(init, watcher, serve)
